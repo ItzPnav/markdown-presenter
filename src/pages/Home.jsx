@@ -5,6 +5,7 @@ import RightPanel from "../components/RightPanel";
 import styles from "./Home.module.css";
 
 const RECENT_KEY = "md-presenter-recent-files";
+const DRAFT_KEY = "md-presenter-draft";
 
 export default function Home() {
   const [markdown, setMarkdown] = useState("");
@@ -18,28 +19,39 @@ export default function Home() {
 
   const fileInputRef = useRef(null);
 
-  /* ===== LOAD FROM localStorage ===== */
+  /* ===== LOAD localStorage ===== */
   useEffect(() => {
-    const saved = localStorage.getItem(RECENT_KEY);
-    if (saved) {
+    const savedRecent = localStorage.getItem(RECENT_KEY);
+    if (savedRecent) {
       try {
-        setRecentFiles(JSON.parse(saved));
+        setRecentFiles(JSON.parse(savedRecent));
       } catch {
         setRecentFiles([]);
       }
     }
+
+    const savedDraft = localStorage.getItem(DRAFT_KEY);
+    if (savedDraft) {
+      setMarkdown(savedDraft);
+    }
+
     setHydrated(true);
   }, []);
 
-  /* ===== SAVE TO localStorage ===== */
+  /* ===== SAVE recent files ===== */
   useEffect(() => {
     if (!hydrated) return;
     localStorage.setItem(RECENT_KEY, JSON.stringify(recentFiles));
   }, [recentFiles, hydrated]);
 
+  /* ===== SAVE draft markdown ===== */
+  useEffect(() => {
+    if (!hydrated) return;
+    localStorage.setItem(DRAFT_KEY, markdown);
+  }, [markdown, hydrated]);
+
   /* ===== FILE LOADER ===== */
   const loadFile = (fileObj) => {
-    // Load from recent list
     if (fileObj.content) {
       setMarkdown((prev) =>
         importMode === "append"
@@ -91,6 +103,19 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
+  /* ===== MOBILE ACTIONS ===== */
+  const copyMarkdown = async () => {
+    if (!markdown) return;
+    await navigator.clipboard.writeText(markdown);
+    alert("Markdown copied to clipboard");
+  };
+
+  const resetMarkdown = () => {
+    setMarkdown("");
+    setShowMobileResult(false);
+    localStorage.removeItem(DRAFT_KEY);
+  };
+
   return (
     <div
       className={styles.container}
@@ -117,13 +142,13 @@ export default function Home() {
         fileInputRef={fileInputRef}
       />
 
-      {/* ===== DESKTOP LAYOUT ===== */}
+      {/* ===== DESKTOP ===== */}
       <div className={styles.desktopContent}>
         <LeftPanel markdown={markdown} setMarkdown={setMarkdown} />
         <RightPanel markdown={markdown} />
       </div>
 
-      {/* ===== MOBILE LAYOUT ===== */}
+      {/* ===== MOBILE ===== */}
       <div className={styles.mobileContent}>
         <h1 className={styles.mobileTitle}>Markdown Presenter</h1>
         <p className={styles.mobileSubtitle}>
@@ -139,6 +164,24 @@ export default function Home() {
             setShowMobileResult(false);
           }}
         />
+
+        <div className={styles.mobileActions}>
+          <button
+            className={styles.secondaryButton}
+            onClick={copyMarkdown}
+            disabled={!markdown.trim()}
+          >
+            Copy
+          </button>
+
+          <button
+            className={styles.secondaryButton}
+            onClick={resetMarkdown}
+            disabled={!markdown.trim()}
+          >
+            Reset
+          </button>
+        </div>
 
         <button
           className={styles.mobileButton}
