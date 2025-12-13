@@ -1,0 +1,134 @@
+.markdown {
+  line-height: 1.7;
+  color: inherit;
+}
+
+/* Paragraphs */
+.paragraph {
+  margin: 0 0 12px 0;
+  word-wrap: break-word;
+}
+
+/* Headers */
+.h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 20px 0 12px;
+}
+
+.h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 18px 0 10px;
+}
+
+.h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 16px 0 8px;
+}
+
+.h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.h5 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.h6 {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Lists */
+.list {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.listItem {
+  margin: 6px 0;
+}
+
+/* Inline code */
+.inlineCode {
+  background: #111;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+/* Code blocks */
+.codeBlock {
+  background: #0f0f0f;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 16px;
+  margin: 16px 0;
+  overflow-x: auto;
+}
+
+.codeBlock code {
+  font-family: monospace;
+  font-size: 0.9rem;
+  white-space: pre;
+}
+
+/* Links */
+.link {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+
+/* Horizontal divider */
+.hr {
+  border: none;
+  border-top: 1px solid #333;
+  margin: 24px 0;
+}
+
+/* Tables */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  background: #111;
+}
+
+.table th,
+.table td {
+  border: 1px solid #333;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.table th {
+  background: #1f2933;
+  font-weight: 600;
+}
+
+.table tr:nth-child(even) td {
+  background: #181818;
+}
+
+/* Emphasis */
+strong {
+  font-weight: 600;
+}
+
+em {
+  font-style: italic;
+}
+
+.hr {
+  border: none;
+  border-top: 1px solid #333;
+  margin: 24px 0;
+  /* page-break-after: always; */
+}
+
+

@@ -1,0 +1,118 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #1e1e1e;
+  color: #eaeaea;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+button {
+  background: #3b82f6;
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #2563eb;
+}
+
+input, textarea {
+  background: #111;
+  color: #eaeaea;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 8px;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+* {
+  scroll-behavior: smooth;
+}
+
+/* ===== Custom Scrollbar ===== */
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a3a transparent;
+}
+
+/* ===========================
+   PDF EXPORT MODE (GLOBAL)
+   =========================== */
+
+.pdf-mode {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.pdf-mode * {
+  color: #000000 !important;
+  background: transparent !important;
+}
+
+/* Headings */
+.pdf-mode h1,
+.pdf-mode h2,
+.pdf-mode h3,
+.pdf-mode h4,
+.pdf-mode h5,
+.pdf-mode h6 {
+  color: #000000 !important;
+}
+
+/* Paragraphs */
+.pdf-mode p {
+  color: #000000 !important;
+}
+
+/* Tables */
+.pdf-mode table {
+  border-collapse: collapse;
+}
+
+.pdf-mode th,
+.pdf-mode td {
+  border: 1px solid #000000 !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Inline code */
+.pdf-mode code {
+  color: #000000 !important;
+  background: #f2f2f2 !important;
+}
+
+/* Horizontal divider */
+.pdf-mode hr {
+  border-top: 1px solid #000000 !important;
+}

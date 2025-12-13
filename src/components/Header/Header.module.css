@@ -1,0 +1,159 @@
+.header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: #181818;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #eaeaea;
+}
+
+.fileName {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* ===== Center ===== */
+
+select {
+  background: #111;
+  color: #eaeaea;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+/* ===== Right actions ===== */
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.right button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.right button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.right button:not(:disabled):hover {
+  background: #1d4ed8;
+}
+
+/* ===== Recent Files Dropdown ===== */
+
+.recentWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Hover target */
+.recentLabel {
+  font-size: 14px;
+  color: #eaeaea;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.recentWrapper:hover .recentLabel {
+  background: #2a2a2a;
+}
+
+/* Invisible buffer to prevent hover flicker */
+.recentWrapper::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 12px;
+}
+
+/* Dropdown list */
+.recentList {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 240px;
+  background: #111;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  padding: 6px 0;
+  list-style: none;
+  margin: 0;
+
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 100;
+}
+
+.recentWrapper:hover .recentList {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* List items */
+.recentList li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #eaeaea;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Mouse hover */
+.recentList li:hover {
+  background: #1f2937;
+}
+
+/* Keyboard-selected item ONLY */
+.active {
+  background: #2563eb !important;
+}
+
+/* Clear recent */
+.clear {
+  margin-top: 4px;
+  padding: 8px 12px;
+  text-align: center;
+  font-size: 12px;
+  color: #aaa;
+  border-top: 1px solid #2a2a2a;
+}
+
+.clear:hover {
+  background: #111;
+  color: #fff;
+}
