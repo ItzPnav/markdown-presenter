@@ -58,12 +58,12 @@ export default function Header({
 
   /* ===== PDF Export (FIXED) ===== */
   const downloadPDF = () => {
-    if (!hasContent) return;
+    if (!markdown.trim()) return;
 
     const el = document.getElementById("pdf-content");
     if (!el) return;
 
-    // Enable print-only styling
+    // Enable print styling
     el.classList.add("pdf-mode");
 
     const options = {
@@ -75,7 +75,7 @@ export default function Header({
         backgroundColor: "#ffffff",
         scrollX: 0,
         scrollY: 0,
-        windowWidth: 794, // A4 width @ 96dpi
+        windowWidth: 794, // match A4 width
       },
       jsPDF: {
         unit: "pt",
@@ -92,6 +92,7 @@ export default function Header({
         el.classList.remove("pdf-mode");
       });
   };
+
 
   return (
     <header className={styles.header}>

@@ -84,11 +84,11 @@
   text-decoration: underline;
 }
 
-/* Horizontal divider */
+/* Section divider */
 .hr {
   border: none;
   border-top: 1px solid #333;
-  margin: 24px 0;
+  margin: 28px 0;
 }
 
 /* Tables */
@@ -124,14 +124,6 @@ em {
   font-style: italic;
 }
 
-.hr {
-  border: none;
-  border-top: 1px solid #333;
-  margin: 24px 0;
-  /* page-break-after: always; */
-}
-
-
 /* =========================
    PDF MODE (EXPORT ONLY)
    ========================= */
@@ -139,12 +131,16 @@ em {
 :global(.pdf-mode) {
   background: #ffffff !important;
   color: #000000 !important;
-  padding: 32px 36px !important;
-  width: 794px; /* A4 width at 96dpi */
+
+  /* ✅ Proper A4 margins */
+  padding: 52px 40px; /* top-bottom | left-right */
+
+  width: 794px; /* A4 width @ 96dpi */
   margin: 0 auto;
   box-sizing: border-box;
 }
 
+/* Force black text everywhere */
 :global(.pdf-mode h1),
 :global(.pdf-mode h2),
 :global(.pdf-mode h3),
@@ -153,18 +149,23 @@ em {
 :global(.pdf-mode h6),
 :global(.pdf-mode p),
 :global(.pdf-mode li),
+:global(.pdf-mode span),
+:global(.pdf-mode strong),
+:global(.pdf-mode em),
 :global(.pdf-mode table),
 :global(.pdf-mode th),
 :global(.pdf-mode td) {
   color: #000000 !important;
 }
 
+/* Clean dividers in PDF */
 :global(.pdf-mode hr) {
   border: none;
   border-top: 1px solid #999;
-  margin: 24px 0;
+  margin: 28px 0;
 }
 
+/* Tables for PDF */
 :global(.pdf-mode table) {
   width: 100%;
   border-collapse: collapse;
