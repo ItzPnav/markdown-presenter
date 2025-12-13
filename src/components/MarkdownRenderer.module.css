@@ -1,6 +1,7 @@
 .markdown {
   line-height: 1.7;
   color: inherit;
+  padding: 0 16px; /* mobile breathing room */
 }
 
 /* Paragraphs */
@@ -195,4 +196,38 @@
 :global(.pdf-mode h2),
 :global(.pdf-mode h3) {
   page-break-after: avoid;
+}
+
+/* =========================
+   MOBILE READABILITY FIX
+   ========================= */
+
+@media (max-width: 768px) {
+  /* Let content use full width */
+  .markdown {
+    padding: 0 20px;
+  }
+
+  /* IMPORTANT: override PDF-style width caps */
+  :global(.markdown) {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Improve text flow on small screens */
+  .paragraph {
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  /* Headings scale better on phones */
+  .h1 { font-size: 1.45rem; }
+  .h2 { font-size: 1.3rem; }
+  .h3 { font-size: 1.15rem; }
+  .h4 { font-size: 1.05rem; }
+
+  /* Tables shouldn’t feel boxed */
+  .table {
+    font-size: 0.95rem;
+  }
 }
