@@ -15,4 +15,18 @@
   line-height: 1.6;
 }
 
+/* =========================
+   DESKTOP READABILITY FIX
+   ========================= */
+
+.editor {
+  display: flex;
+  justify-content: center;
+}
+
+/* Limit readable line width */
+.editor textarea {
+  max-width: 90ch;     /* 👈 key fix */
+  width: 100%;
+}
 
