@@ -137,7 +137,6 @@
 
 /* Restrict readable content width */
 :global(.pdf-mode .markdown) {
-  max-width: 94ch; /* 90–96 sweet spot */
   width: 100%;
 }
 
