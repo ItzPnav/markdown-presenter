@@ -7,88 +7,27 @@
 }
 
 /* =========================
-   DESKTOP
+   MAIN CONTENT (UNIFIED)
    ========================= */
 
 .desktopContent {
   flex: 1;
   display: flex;
-  min-height: 0; /* 🔥 critical */
+  min-height: 0; /* critical for scroll */
 }
 
-/* Hide desktop on mobile */
-@media (max-width: 768px) {
-  .desktopContent {
-    display: none;
-  }
+/* We no longer force-hide desktop */
+.mobileContent {
+  display: none; /* kept only if you want it later */
 }
 
 /* =========================
-   MOBILE
+   OPTIONAL: SOFT MOBILE TUNING
+   (NO BREAKPOINT LOGIC)
    ========================= */
 
-.mobileContent {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .mobileContent {
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    gap: 16px;
-    overflow-y: auto;
-  }
-}
-
-.mobileTitle {
-  font-size: 28px;
-  font-weight: 700;
-  text-align: center;
-}
-
-.mobileSubtitle {
-  font-size: 14px;
-  color: #9ca3af;
-  text-align: center;
-}
-
-.mobileTextarea {
-  min-height: 200px;
-  width: 100%;
-  background: #0b0b0b;
-  border: 1px solid #333;
-  border-radius: 10px;
-  padding: 14px;
-  color: #fff;
-  font-size: 14px;
-  resize: vertical;
-}
-
-.mobileTextarea::placeholder {
-  color: #6b7280;
-}
-
-.mobileButton {
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.mobileButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.mobilePreview {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #333;
+.desktopContent > * {
+  min-width: 0; /* 🔥 prevents text squeezing in flex */
 }
 
 /* =========================
@@ -107,27 +46,6 @@
   color: #fff;
   z-index: 50;
   pointer-events: none;
-}
-
-.mobileActions {
-  display: flex;
-  gap: 10px;
-}
-
-.secondaryButton {
-  flex: 1;
-  background: #111;
-  border: 1px solid #333;
-  color: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.secondaryButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 /* =========================
