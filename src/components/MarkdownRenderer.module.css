@@ -126,7 +126,7 @@
   font-size: 12px;
   line-height: 1.55;
 
-  width: 794px; /* A4 width @ 96dpi */
+  width: 100%; /* A4 width @ 96dpi */
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
