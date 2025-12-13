@@ -208,6 +208,7 @@ export default function Home() {
           Drop your <strong>.md</strong> file
         </div>
       )}
+      {toast && <div className={styles.toast}>{toast}</div>}
     </div>
   );
 }
