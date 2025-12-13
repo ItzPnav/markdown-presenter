@@ -8,6 +8,7 @@ const RECENT_KEY = "md-presenter-recent-files";
 const DRAFT_KEY = "md-presenter-draft";
 
 export default function Home() {
+  const [toast, setToast] = useState("");
   const [markdown, setMarkdown] = useState("");
   const [currentFile, setCurrentFile] = useState(null);
   const [recentFiles, setRecentFiles] = useState([]);
@@ -107,7 +108,11 @@ export default function Home() {
   const copyMarkdown = async () => {
     if (!markdown) return;
     await navigator.clipboard.writeText(markdown);
-    alert("Markdown copied to clipboard");
+    setToast("Markdown copied to clipboard");
+
+    setTimeout(() => {
+      setToast("");
+    }, 2000);
   };
 
   const resetMarkdown = () => {
