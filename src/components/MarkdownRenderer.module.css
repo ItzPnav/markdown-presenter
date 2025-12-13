@@ -1,16 +1,35 @@
 .markdown {
   line-height: 1.7;
   color: inherit;
-  padding: 0 16px; /* mobile breathing room */
 }
 
-/* Paragraphs */
+/* =========================
+   PARAGRAPHS (FIXED)
+   ========================= */
+
 .paragraph {
   margin: 0 0 12px 0;
-  word-wrap: break-word;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
 }
 
-/* Headings */
+/* Global safety: NEVER force word breaking */
+.markdown p,
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+/* =========================
+   HEADINGS
+   ========================= */
+
 .h1 {
   font-size: 1.75rem;
   font-weight: 700;
@@ -44,7 +63,10 @@
   font-weight: 600;
 }
 
-/* Lists */
+/* =========================
+   LISTS
+   ========================= */
+
 .list {
   margin: 12px 0;
   padding-left: 24px;
@@ -54,7 +76,10 @@
   margin: 6px 0;
 }
 
-/* Inline code */
+/* =========================
+   INLINE CODE
+   ========================= */
+
 .inlineCode {
   background: #111;
   padding: 2px 6px;
@@ -63,7 +88,10 @@
   font-size: 0.9em;
 }
 
-/* Code blocks */
+/* =========================
+   CODE BLOCKS
+   ========================= */
+
 .codeBlock {
   background: #0f0f0f;
   border: 1px solid #333;
@@ -73,7 +101,10 @@
   overflow-x: auto;
 }
 
-/* Links */
+/* =========================
+   LINKS
+   ========================= */
+
 .link {
   color: #60a5fa;
   text-decoration: underline;
@@ -122,11 +153,10 @@
   background: #ffffff !important;
   color: #000000 !important;
 
-  /* Typography tuning (THE FIX) */
   font-size: 12px;
   line-height: 1.55;
 
-  width: 100%; /* A4 width @ 96dpi */
+  width: 100%;
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
@@ -135,7 +165,6 @@
   justify-content: center;
 }
 
-/* Restrict readable content width */
 :global(.pdf-mode .markdown) {
   width: 100%;
 }
@@ -158,17 +187,16 @@
   color: #000000 !important;
 }
 
-/* Slightly smaller headings in PDF */
+/* Smaller headings for PDF */
 :global(.pdf-mode h1) { font-size: 20px; }
 :global(.pdf-mode h2) { font-size: 18px; }
 :global(.pdf-mode h3) { font-size: 16px; }
 :global(.pdf-mode h4) { font-size: 14px; }
 
 /* =========================
-   PAGE SAFETY RULES
+   PAGE SAFETY
    ========================= */
 
-/* Never split paragraphs or list items */
 :global(.pdf-mode p),
 :global(.pdf-mode li) {
   page-break-inside: avoid;
@@ -179,18 +207,15 @@
   padding-left: 20px;
 }
 
-/* Never split hr */
 :global(.pdf-mode hr) {
   page-break-inside: avoid;
   break-inside: avoid;
 }
 
-/* Hide hr if it lands at top of page */
 :global(.pdf-mode hr:first-child) {
   display: none !important;
 }
 
-/* Prevent heading from detaching from content */
 :global(.pdf-mode h1),
 :global(.pdf-mode h2),
 :global(.pdf-mode h3) {
@@ -198,34 +223,33 @@
 }
 
 /* =========================
-   MOBILE READABILITY FIX
+   MOBILE READABILITY (FIXED)
    ========================= */
 
 @media (max-width: 768px) {
-  /* Let content use full width */
   .markdown {
     padding: 0 20px;
+    max-width: 100%;
   }
 
-  /* IMPORTANT: override PDF-style width caps */
-  :global(.markdown) {
-    max-width: 100% !important;
-    width: 100% !important;
+  .markdown p,
+  .markdown h1,
+  .markdown h2,
+  .markdown h3 {
+    word-break: normal !important;
+    overflow-wrap: normal !important;
   }
 
-  /* Improve text flow on small screens */
   .paragraph {
     font-size: 1rem;
     line-height: 1.75;
   }
 
-  /* Headings scale better on phones */
   .h1 { font-size: 1.45rem; }
   .h2 { font-size: 1.3rem; }
   .h3 { font-size: 1.15rem; }
   .h4 { font-size: 1.05rem; }
 
-  /* Tables shouldn’t feel boxed */
   .table {
     font-size: 0.95rem;
   }
