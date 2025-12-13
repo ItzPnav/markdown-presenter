@@ -9,23 +9,23 @@
   word-wrap: break-word;
 }
 
-/* Headers */
+/* Headings */
 .h1 {
   font-size: 1.75rem;
   font-weight: 700;
-  margin: 20px 0 12px;
+  margin: 24px 0 12px;
 }
 
 .h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  margin: 18px 0 10px;
+  margin: 22px 0 10px;
 }
 
 .h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  margin: 16px 0 8px;
+  margin: 20px 0 8px;
 }
 
 .h4 {
@@ -72,26 +72,28 @@
   overflow-x: auto;
 }
 
-.codeBlock code {
-  font-family: monospace;
-  font-size: 0.9rem;
-  white-space: pre;
-}
-
 /* Links */
 .link {
   color: #60a5fa;
   text-decoration: underline;
 }
 
-/* Section divider */
+/* =========================
+   SECTION DIVIDER (HR)
+   ========================= */
+
 .hr {
   border: none;
   border-top: 1px solid #333;
-  margin: 28px 0;
+  margin: 32px 0;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
-/* Tables */
+/* =========================
+   TABLES
+   ========================= */
+
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -111,19 +113,6 @@
   font-weight: 600;
 }
 
-.table tr:nth-child(even) td {
-  background: #181818;
-}
-
-/* Emphasis */
-strong {
-  font-weight: 600;
-}
-
-em {
-  font-style: italic;
-}
-
 /* =========================
    PDF MODE (EXPORT ONLY)
    ========================= */
@@ -132,15 +121,26 @@ em {
   background: #ffffff !important;
   color: #000000 !important;
 
-  /* ✅ Proper A4 margins */
-  padding: 52px 40px; /* top-bottom | left-right */
+  /* Typography tuning (THE FIX) */
+  font-size: 12px;
+  line-height: 1.55;
 
   width: 794px; /* A4 width @ 96dpi */
   margin: 0 auto;
+  padding: 0;
   box-sizing: border-box;
+
+  display: flex;
+  justify-content: center;
 }
 
-/* Force black text everywhere */
+/* Restrict readable content width */
+:global(.pdf-mode .markdown) {
+  max-width: 94ch; /* 90–96 sweet spot */
+  width: 100%;
+}
+
+/* Force black text in PDF */
 :global(.pdf-mode h1),
 :global(.pdf-mode h2),
 :global(.pdf-mode h3),
@@ -158,25 +158,41 @@ em {
   color: #000000 !important;
 }
 
-/* Clean dividers in PDF */
-:global(.pdf-mode hr) {
-  border: none;
-  border-top: 1px solid #999;
-  margin: 28px 0;
-}
+/* Slightly smaller headings in PDF */
+:global(.pdf-mode h1) { font-size: 20px; }
+:global(.pdf-mode h2) { font-size: 18px; }
+:global(.pdf-mode h3) { font-size: 16px; }
+:global(.pdf-mode h4) { font-size: 14px; }
 
-/* Tables for PDF */
-:global(.pdf-mode table) {
-  width: 100%;
-  border-collapse: collapse;
-}
+/* =========================
+   PAGE SAFETY RULES
+   ========================= */
 
-:global(.pdf-mode th),
-:global(.pdf-mode td) {
-  border: 1px solid #333;
-  padding: 8px;
+/* Never split paragraphs or list items */
+:global(.pdf-mode p),
+:global(.pdf-mode li) {
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 :global(.pdf-mode ul) {
   padding-left: 20px;
+}
+
+/* Never split hr */
+:global(.pdf-mode hr) {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Hide hr if it lands at top of page */
+:global(.pdf-mode hr:first-child) {
+  display: none !important;
+}
+
+/* Prevent heading from detaching from content */
+:global(.pdf-mode h1),
+:global(.pdf-mode h2),
+:global(.pdf-mode h3) {
+  page-break-after: avoid;
 }

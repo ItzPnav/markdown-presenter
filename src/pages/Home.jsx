@@ -13,10 +13,12 @@ export default function Home() {
   const [importMode, setImportMode] = useState("replace");
   const [isDragging, setIsDragging] = useState(false);
 
-  const [hydrated, setHydrated] = useState(false); // ✅ IMPORTANT
+  const [hydrated, setHydrated] = useState(false);
+  const [showMobileResult, setShowMobileResult] = useState(false);
+
   const fileInputRef = useRef(null);
 
-  /* ===== LOAD FROM localStorage (ONCE) ===== */
+  /* ===== LOAD FROM localStorage ===== */
   useEffect(() => {
     const saved = localStorage.getItem(RECENT_KEY);
     if (saved) {
@@ -26,18 +28,18 @@ export default function Home() {
         setRecentFiles([]);
       }
     }
-    setHydrated(true); // ✅ mark done
+    setHydrated(true);
   }, []);
 
-  /* ===== SAVE TO localStorage (ONLY AFTER HYDRATION) ===== */
+  /* ===== SAVE TO localStorage ===== */
   useEffect(() => {
-    if (!hydrated) return; // ❌ prevent wiping on first render
+    if (!hydrated) return;
     localStorage.setItem(RECENT_KEY, JSON.stringify(recentFiles));
   }, [recentFiles, hydrated]);
 
   /* ===== FILE LOADER ===== */
   const loadFile = (fileObj) => {
-    // From Recent list
+    // Load from recent list
     if (fileObj.content) {
       setMarkdown((prev) =>
         importMode === "append"
@@ -45,10 +47,10 @@ export default function Home() {
           : fileObj.content
       );
       setCurrentFile(fileObj.name);
+      setShowMobileResult(true);
       return;
     }
 
-    // From Upload / Drop
     if (!fileObj.name.toLowerCase().endsWith(".md")) {
       alert("Only .md files supported");
       return;
@@ -63,6 +65,7 @@ export default function Home() {
       );
 
       setCurrentFile(fileObj.name);
+      setShowMobileResult(true);
 
       setRecentFiles((prev) => {
         const filtered = prev.filter((f) => f.name !== fileObj.name);
@@ -114,9 +117,42 @@ export default function Home() {
         fileInputRef={fileInputRef}
       />
 
-      <div className={styles.content}>
+      {/* ===== DESKTOP LAYOUT ===== */}
+      <div className={styles.desktopContent}>
         <LeftPanel markdown={markdown} setMarkdown={setMarkdown} />
         <RightPanel markdown={markdown} />
+      </div>
+
+      {/* ===== MOBILE LAYOUT ===== */}
+      <div className={styles.mobileContent}>
+        <h1 className={styles.mobileTitle}>Markdown Presenter</h1>
+        <p className={styles.mobileSubtitle}>
+          Paste markdown and instantly see a clean preview
+        </p>
+
+        <textarea
+          className={styles.mobileTextarea}
+          placeholder="Paste your markdown here..."
+          value={markdown}
+          onChange={(e) => {
+            setMarkdown(e.target.value);
+            setShowMobileResult(false);
+          }}
+        />
+
+        <button
+          className={styles.mobileButton}
+          disabled={!markdown.trim()}
+          onClick={() => setShowMobileResult(true)}
+        >
+          Show Result
+        </button>
+
+        {showMobileResult && (
+          <div className={styles.mobilePreview}>
+            <RightPanel markdown={markdown} />
+          </div>
+        )}
       </div>
 
       {isDragging && (

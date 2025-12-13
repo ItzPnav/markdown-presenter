@@ -1,8 +1,13 @@
 .right {
   width: 60%;
+  height: 100%;
   background: #1e1e1e;
   padding: 24px;
   overflow-y: auto;
+}
+
+#pdf-content {
+  padding-top: 12px; /* 🔥 prevents divider touching headings */
 }
 
 .emptyState {

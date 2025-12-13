@@ -67,22 +67,30 @@ export default function Header({
     el.classList.add("pdf-mode");
 
     const options = {
-      margin: 0, // margins handled via CSS
       filename: currentFile || "markdown-output.pdf",
+
+      margin: [48, 40, 48, 40], 
+      // [top, left, bottom, right] — APPLIED PER PAGE
+
       image: { type: "jpeg", quality: 1 },
+
       html2canvas: {
         scale: 2,
         backgroundColor: "#ffffff",
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: 794, // match A4 width
+        windowWidth: 794,
       },
+
       jsPDF: {
         unit: "pt",
         format: "a4",
         orientation: "portrait",
       },
+
+      pagebreak: {
+        mode: ["css", "legacy"],
+      },
     };
+
 
     html2pdf()
       .set(options)
