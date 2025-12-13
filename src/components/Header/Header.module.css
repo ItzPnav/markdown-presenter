@@ -1,12 +1,17 @@
 .header {
+  background: #181818;
+  border-bottom: 1px solid #2a2a2a;
+  padding: 0 16px;
+}
+
+.headerInner {
   height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
-  background: #181818;
-  border-bottom: 1px solid #2a2a2a;
 }
+
+/* ===== Left ===== */
 
 .left {
   display: flex;
@@ -25,9 +30,15 @@
   color: #9ca3af;
 }
 
-/* ===== Center ===== */
+/* ===== Controls ===== */
 
-select {
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modeSelect {
   background: #111;
   color: #eaeaea;
   border: 1px solid #333;
@@ -35,7 +46,7 @@ select {
   padding: 4px 8px;
 }
 
-/* ===== Right actions ===== */
+/* ===== Right ===== */
 
 .right {
   display: flex;
@@ -62,14 +73,12 @@ select {
   background: #1d4ed8;
 }
 
-/* ===== Recent Files Dropdown ===== */
+/* ===== Recent Files ===== */
 
 .recentWrapper {
   position: relative;
-  display: inline-block;
 }
 
-/* Hover target */
 .recentLabel {
   font-size: 14px;
   color: #eaeaea;
@@ -82,7 +91,6 @@ select {
   background: #2a2a2a;
 }
 
-/* Invisible buffer to prevent hover flicker */
 .recentWrapper::after {
   content: "";
   position: absolute;
@@ -92,7 +100,6 @@ select {
   height: 12px;
 }
 
-/* Dropdown list */
 .recentList {
   position: absolute;
   top: calc(100% + 8px);
@@ -119,7 +126,6 @@ select {
   pointer-events: auto;
 }
 
-/* List items */
 .recentList li {
   display: flex;
   align-items: center;
@@ -133,17 +139,14 @@ select {
   text-overflow: ellipsis;
 }
 
-/* Mouse hover */
 .recentList li:hover {
   background: #1f2937;
 }
 
-/* Keyboard-selected item ONLY */
 .active {
   background: #2563eb !important;
 }
 
-/* Clear recent */
 .clear {
   margin-top: 4px;
   padding: 8px 12px;
@@ -156,4 +159,63 @@ select {
 .clear:hover {
   background: #111;
   color: #fff;
+}
+
+/* =========================
+   MOBILE FIX
+   ========================= */
+
+@media (max-width: 768px) {
+  .headerInner {
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    gap: 10px;
+    padding: 12px 0;
+  }
+
+  .left {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 2px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .fileName {
+    font-size: 12px;
+  }
+
+  .controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .modeSelect {
+    width: 100%;
+  }
+
+  .right {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .right button {
+    flex: 1;
+    min-width: 90px;
+  }
+
+  .recentWrapper {
+    width: 100%;
+    text-align: center;
+  }
+
+  .recentList {
+    right: 50%;
+    transform: translateX(50%);
+  }
 }

@@ -56,41 +56,33 @@ export default function Header({
     setActiveIndex(-1);
   };
 
-  /* ===== PDF Export (FIXED) ===== */
+  /* ===== PDF Export ===== */
   const downloadPDF = () => {
     if (!markdown.trim()) return;
 
     const el = document.getElementById("pdf-content");
     if (!el) return;
 
-    // Enable print styling
     el.classList.add("pdf-mode");
 
     const options = {
       filename: currentFile || "markdown-output.pdf",
-
-      margin: [48, 40, 48, 40], 
-      // [top, left, bottom, right] — APPLIED PER PAGE
-
+      margin: [48, 40, 48, 40],
       image: { type: "jpeg", quality: 1 },
-
       html2canvas: {
         scale: 2,
         backgroundColor: "#ffffff",
         windowWidth: 794,
       },
-
       jsPDF: {
         unit: "pt",
         format: "a4",
         orientation: "portrait",
       },
-
       pagebreak: {
         mode: ["css", "legacy"],
       },
     };
-
 
     html2pdf()
       .set(options)
@@ -101,72 +93,79 @@ export default function Header({
       });
   };
 
-
   return (
     <header className={styles.header}>
-      <div className={styles.left}>
-        <span className={styles.title}>Markdown Presenter</span>
-        {currentFile && (
-          <span className={styles.fileName}>{currentFile}</span>
-        )}
-      </div>
+      <div className={styles.headerInner}>
+        {/* LEFT */}
+        <div className={styles.left}>
+          <span className={styles.title}>Markdown Presenter</span>
+          {currentFile && (
+            <span className={styles.fileName}>{currentFile}</span>
+          )}
+        </div>
 
-      <select
-        className={styles.modeSelect}
-        value={importMode}
-        onChange={(e) => setImportMode(e.target.value)}
-      >
-        <option value="replace">Replace</option>
-        <option value="append">Append</option>
-      </select>
+        {/* CONTROLS */}
+        <div className={styles.controls}>
+          <select
+            className={styles.modeSelect}
+            value={importMode}
+            onChange={(e) => setImportMode(e.target.value)}
+          >
+            <option value="replace">Replace</option>
+            <option value="append">Append</option>
+          </select>
 
-      <div className={styles.right}>
-        <input
-          type="file"
-          accept=".md"
-          hidden
-          ref={fileInputRef}
-          onChange={(e) => e.target.files[0] && loadFile(e.target.files[0])}
-        />
+          <div className={styles.right}>
+            <input
+              type="file"
+              accept=".md"
+              hidden
+              ref={fileInputRef}
+              onChange={(e) =>
+                e.target.files[0] && loadFile(e.target.files[0])
+              }
+            />
 
-        <button onClick={() => fileInputRef.current.click()}>
-          Upload
-        </button>
+            <button onClick={() => fileInputRef.current.click()}>
+              Upload
+            </button>
 
-        <button disabled={!hasContent} onClick={downloadPDF}>
-          PDF
-        </button>
+            <button disabled={!hasContent} onClick={downloadPDF}>
+              PDF
+            </button>
 
-        {recentFiles.length > 0 && (
-          <div className={styles.recentWrapper}>
-            <span className={styles.recentLabel}>📂 Recent ▾</span>
+            {recentFiles.length > 0 && (
+              <div className={styles.recentWrapper}>
+                <span className={styles.recentLabel}>📂 Recent ▾</span>
 
-            <ul className={styles.recentList}>
-              {recentFiles.map((f, i) => (
-                <li
-                  key={f.name}
-                  className={i === activeIndex ? styles.active : ""}
-                  onClick={() => loadFile(f)}
-                >
-                  <span
-                    className={styles.pin}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      togglePin(f.name);
-                    }}
-                  >
-                    {f.pinned ? "📌" : "📍"}
-                  </span>
-                  {f.name}
-                </li>
-              ))}
+                <ul className={styles.recentList}>
+                  {recentFiles.map((f, i) => (
+                    <li
+                      key={f.name}
+                      className={i === activeIndex ? styles.active : ""}
+                      onClick={() => loadFile(f)}
+                    >
+                      <span
+                        className={styles.pin}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          togglePin(f.name);
+                        }}
+                      >
+                        {f.pinned ? "📌" : "📍"}
+                      </span>
+                      {f.name}
+                    </li>
+                  ))}
 
-              <li className={styles.clear} onClick={clearRecent}>
-                Clear Recent
-              </li>
-            </ul>
+                  <li className={styles.clear} onClick={clearRecent}>
+                    Clear Recent
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </header>
   );
