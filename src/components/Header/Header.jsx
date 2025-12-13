@@ -12,26 +12,22 @@ export default function Header({
   loadFile,
   fileInputRef,
 }) {
-  const [activeIndex, setActiveIndex] = useState(-1); // nothing selected by default
+  const [activeIndex, setActiveIndex] = useState(-1);
   const hasContent = markdown.trim().length > 0;
 
-  /* ===== Keyboard navigation ===== */
+  /* ===== Keyboard navigation for recent files ===== */
   useEffect(() => {
     const handler = (e) => {
       if (!recentFiles.length) return;
 
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setActiveIndex((i) =>
-          i < recentFiles.length - 1 ? i + 1 : 0
-        );
+        setActiveIndex((i) => (i < recentFiles.length - 1 ? i + 1 : 0));
       }
 
       if (e.key === "ArrowUp") {
         e.preventDefault();
-        setActiveIndex((i) =>
-          i > 0 ? i - 1 : recentFiles.length - 1
-        );
+        setActiveIndex((i) => (i > 0 ? i - 1 : recentFiles.length - 1));
       }
 
       if (e.key === "Enter" && activeIndex >= 0) {
@@ -43,7 +39,6 @@ export default function Header({
     return () => window.removeEventListener("keydown", handler);
   }, [recentFiles, activeIndex, loadFile]);
 
-
   /* ===== Pin / Unpin ===== */
   const togglePin = (name) => {
     setRecentFiles((prev) =>
@@ -51,40 +46,64 @@ export default function Header({
         .map((f) =>
           f.name === name ? { ...f, pinned: !f.pinned } : f
         )
-        .sort((a, b) => b.pinned - a.pinned)
+        .sort((a, b) => (b.pinned === a.pinned ? 0 : b.pinned ? 1 : -1))
     );
   };
 
   /* ===== Clear recent ===== */
   const clearRecent = () => {
     setRecentFiles([]);
+    setActiveIndex(-1);
   };
 
-  /* ===== PDF ===== */
+  /* ===== PDF Export (FIXED) ===== */
   const downloadPDF = () => {
     if (!hasContent) return;
+
     const el = document.getElementById("pdf-content");
+    if (!el) return;
+
+    // Enable print-only styling
     el.classList.add("pdf-mode");
 
+    const options = {
+      margin: 0, // margins handled via CSS
+      filename: currentFile || "markdown-output.pdf",
+      image: { type: "jpeg", quality: 1 },
+      html2canvas: {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: 794, // A4 width @ 96dpi
+      },
+      jsPDF: {
+        unit: "pt",
+        format: "a4",
+        orientation: "portrait",
+      },
+    };
+
     html2pdf()
-      .set({
-        filename: currentFile || "markdown-output.pdf",
-        html2canvas: { scale: 2, backgroundColor: "#fff" },
-        jsPDF: { unit: "mm", format: "a4" },
-      })
+      .set(options)
       .from(el)
       .save()
-      .then(() => el.classList.remove("pdf-mode"));
+      .finally(() => {
+        el.classList.remove("pdf-mode");
+      });
   };
 
   return (
-    <div className={styles.header}>
+    <header className={styles.header}>
       <div className={styles.left}>
         <span className={styles.title}>Markdown Presenter</span>
-        {currentFile && <span className={styles.fileName}>{currentFile}</span>}
+        {currentFile && (
+          <span className={styles.fileName}>{currentFile}</span>
+        )}
       </div>
 
       <select
+        className={styles.modeSelect}
         value={importMode}
         onChange={(e) => setImportMode(e.target.value)}
       >
@@ -101,7 +120,10 @@ export default function Header({
           onChange={(e) => e.target.files[0] && loadFile(e.target.files[0])}
         />
 
-        <button onClick={() => fileInputRef.current.click()}>Upload</button>
+        <button onClick={() => fileInputRef.current.click()}>
+          Upload
+        </button>
+
         <button disabled={!hasContent} onClick={downloadPDF}>
           PDF
         </button>
@@ -117,7 +139,13 @@ export default function Header({
                   className={i === activeIndex ? styles.active : ""}
                   onClick={() => loadFile(f)}
                 >
-                  <span onClick={() => togglePin(f.name)}>
+                  <span
+                    className={styles.pin}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      togglePin(f.name);
+                    }}
+                  >
                     {f.pinned ? "📌" : "📍"}
                   </span>
                   {f.name}
@@ -131,6 +159,6 @@ export default function Header({
           </div>
         )}
       </div>
-    </div>
+    </header>
   );
 }
