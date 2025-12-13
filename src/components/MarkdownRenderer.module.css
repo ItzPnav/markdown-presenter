@@ -1,20 +1,13 @@
 .markdown {
   line-height: 1.7;
   color: inherit;
+  padding: 0 20px; /* consistent breathing room everywhere */
 }
 
 /* =========================
-   PARAGRAPHS (FIXED)
+   TEXT FLOW SAFETY (GLOBAL)
    ========================= */
 
-.paragraph {
-  margin: 0 0 12px 0;
-  overflow-wrap: normal;
-  word-break: normal;
-  hyphens: none;
-}
-
-/* Global safety: NEVER force word breaking */
 .markdown p,
 .markdown h1,
 .markdown h2,
@@ -24,6 +17,15 @@
 .markdown h6 {
   word-break: normal;
   overflow-wrap: normal;
+  hyphens: none;
+}
+
+/* =========================
+   PARAGRAPHS
+   ========================= */
+
+.paragraph {
+  margin: 0 0 12px 0;
 }
 
 /* =========================
@@ -165,6 +167,7 @@
   justify-content: center;
 }
 
+/* PDF content width */
 :global(.pdf-mode .markdown) {
   width: 100%;
 }
@@ -187,14 +190,14 @@
   color: #000000 !important;
 }
 
-/* Smaller headings for PDF */
+/* PDF heading sizes */
 :global(.pdf-mode h1) { font-size: 20px; }
 :global(.pdf-mode h2) { font-size: 18px; }
 :global(.pdf-mode h3) { font-size: 16px; }
 :global(.pdf-mode h4) { font-size: 14px; }
 
 /* =========================
-   PAGE SAFETY
+   PAGE SAFETY (PDF)
    ========================= */
 
 :global(.pdf-mode p),
@@ -220,37 +223,4 @@
 :global(.pdf-mode h2),
 :global(.pdf-mode h3) {
   page-break-after: avoid;
-}
-
-/* =========================
-   MOBILE READABILITY (FIXED)
-   ========================= */
-
-@media (max-width: 768px) {
-  .markdown {
-    padding: 0 20px;
-    max-width: 100%;
-  }
-
-  .markdown p,
-  .markdown h1,
-  .markdown h2,
-  .markdown h3 {
-    word-break: normal !important;
-    overflow-wrap: normal !important;
-  }
-
-  .paragraph {
-    font-size: 1rem;
-    line-height: 1.75;
-  }
-
-  .h1 { font-size: 1.45rem; }
-  .h2 { font-size: 1.3rem; }
-  .h3 { font-size: 1.15rem; }
-  .h4 { font-size: 1.05rem; }
-
-  .table {
-    font-size: 0.95rem;
-  }
 }
