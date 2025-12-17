@@ -33,10 +33,9 @@ export const MarkdownRenderer = ({ content }) => {
   const processInlineMarkdown = (text) => {
     const parts = [];
 
-    // Order matters: image first so it doesn't collide with other patterns
     const patterns = [
       {
-        // captures the src attribute
+        // <img src="...">
         regex: /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g,
         type: "image",
       },
@@ -61,10 +60,8 @@ export const MarkdownRenderer = ({ content }) => {
       }
     });
 
-    // Sort by appearance
     matches.sort((a, b) => a.start - b.start);
 
-    // Remove overlapping matches
     const filtered = [];
     for (const m of matches) {
       const last = filtered[filtered.length - 1];
@@ -75,7 +72,6 @@ export const MarkdownRenderer = ({ content }) => {
 
     let cursor = 0;
 
-    // Build output
     filtered.forEach((m, i) => {
       if (m.start > cursor) {
         parts.push(text.slice(cursor, m.start));
@@ -142,13 +138,29 @@ export const MarkdownRenderer = ({ content }) => {
     return parts;
   };
 
+  const isCenteredDiv = (line) =>
+    /^<div\s+align=["'](center|centre)["']>.*<\/div>\s*$/i.test(line.trim());
+
+  const renderCenteredDiv = (line, index) => {
+    const match = line.trim().match(
+      /^<div\s+align=["'](center|centre)["']>(.*)<\/div>\s*$/i
+    );
+    if (!match) return null;
+    const inner = match[2].trim();
+    return (
+      <div key={`center-${index}`} className={styles.centeredBlock}>
+        {processInlineMarkdown(inner)}
+      </div>
+    );
+  };
+
   /* 🔥 IMPORTANT: classic for-loop */
   for (let index = 0; index < lines.length; index++) {
     const line = lines[index];
     const trimmed = line.trim();
 
     /* Code blocks */
-    if (trimmed.startsWith("```")) {
+    if (trimmed.startsWith("``` ")) {
       if (inCodeBlock) {
         elements.push(
           <pre key={`code-${index}`} className={styles.codeBlock}>
@@ -196,7 +208,6 @@ export const MarkdownRenderer = ({ content }) => {
         index++;
       }
 
-      // step back one so for-loop increment lands correctly
       index--;
 
       if (currentParagraph.length) {
@@ -226,6 +237,16 @@ export const MarkdownRenderer = ({ content }) => {
           </tbody>
         </table>
       );
+      continue;
+    }
+
+    /* Centered div line */
+    if (isCenteredDiv(line)) {
+      if (currentParagraph.length) {
+        elements.push(processParagraph(currentParagraph));
+        currentParagraph = [];
+      }
+      elements.push(renderCenteredDiv(line, index));
       continue;
     }
 
@@ -290,7 +311,6 @@ export const MarkdownRenderer = ({ content }) => {
       );
       continue;
     } else if (inList) {
-      // list just ended
       elements.push(
         <ul key={`ul-${index}`} className={styles.list}>
           {listItems}
@@ -313,7 +333,6 @@ export const MarkdownRenderer = ({ content }) => {
     currentParagraph.push(line);
   }
 
-  // Flush remaining paragraph or list
   if (currentParagraph.length) {
     elements.push(processParagraph(currentParagraph));
   }
