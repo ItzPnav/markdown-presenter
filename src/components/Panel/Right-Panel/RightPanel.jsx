@@ -1,4 +1,4 @@
-import { MarkdownRenderer } from "./MarkdownRenderer";
+import { MarkdownRenderer } from "../../MarkdownRenderer/MarkdownRenderer";
 import styles from "./RightPanel.module.css";
 
 export default function RightPanel({ markdown }) {

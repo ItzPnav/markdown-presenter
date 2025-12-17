@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import Header from "../components/Header/Header";
-import LeftPanel from "../components/LeftPanel";
-import RightPanel from "../components/RightPanel";
+import LeftPanel from "../components/Panel/Left-Panel/LeftPanel";
+import RightPanel from "../components/Panel/Right-Panel/RightPanel";
 import styles from "./Home.module.css";
 
 const RECENT_KEY = "md-presenter-recent-files";
