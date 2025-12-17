@@ -1,4 +1,5 @@
 import React from "react";
+import katex from "katex";
 import styles from "./MarkdownRenderer.module.css";
 
 export const MarkdownRenderer = ({ content }) => {
@@ -34,8 +35,12 @@ export const MarkdownRenderer = ({ content }) => {
     const parts = [];
 
     const patterns = [
+      // Block math $$...$$
+      { regex: /\$\$(.*?)\$\$/g, type: "block-math" },
+      // Inline math $...$
+      { regex: /\$(.*?)\$/g, type: "inline-math" },
+      // Images
       {
-        // <img src="...">
         regex: /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g,
         type: "image",
       },
@@ -78,6 +83,32 @@ export const MarkdownRenderer = ({ content }) => {
       }
 
       switch (m.type) {
+        case "block-math": {
+          const html = katex.renderToString(m.content, {
+            displayMode: true,
+            throwOnError: false,
+          });
+          parts.push(
+            <div
+              key={`bm-${i}`}
+              className={styles.mathBlock}
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
+          );
+          break;
+        }
+        case "inline-math": {
+          const html = katex.renderToString(m.content, {
+            throwOnError: false,
+          });
+          parts.push(
+            <span
+              key={`im-${i}`}
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
+          );
+          break;
+        }
         case "image": {
           const src = m.content;
           parts.push(
@@ -160,7 +191,7 @@ export const MarkdownRenderer = ({ content }) => {
     const trimmed = line.trim();
 
     /* Code blocks */
-    if (trimmed.startsWith("``` ")) {
+    if (trimmed.startsWith("```")) {
       if (inCodeBlock) {
         elements.push(
           <pre key={`code-${index}`} className={styles.codeBlock}>
