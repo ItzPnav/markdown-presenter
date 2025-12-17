@@ -14,7 +14,6 @@ export default function Home() {
   const [recentFiles, setRecentFiles] = useState([]);
   const [importMode, setImportMode] = useState("replace");
   const [isDragging, setIsDragging] = useState(false);
-
   const [hydrated, setHydrated] = useState(false);
   const [showMobileResult, setShowMobileResult] = useState(false);
 
@@ -55,9 +54,7 @@ export default function Home() {
   const loadFile = (fileObj) => {
     if (fileObj.content) {
       setMarkdown((prev) =>
-        importMode === "append"
-          ? prev + "\n\n" + fileObj.content
-          : fileObj.content
+        importMode === "append" ? prev + "\n\n" + fileObj.content : fileObj.content
       );
       setCurrentFile(fileObj.name);
       setShowMobileResult(true);
@@ -76,7 +73,6 @@ export default function Home() {
       setMarkdown((prev) =>
         importMode === "append" ? prev + "\n\n" + text : text
       );
-
       setCurrentFile(fileObj.name);
       setShowMobileResult(true);
 
@@ -88,7 +84,6 @@ export default function Home() {
         ].slice(0, 5);
       });
     };
-
     reader.readAsText(fileObj);
   };
 
@@ -100,6 +95,7 @@ export default function Home() {
         fileInputRef.current?.click();
       }
     };
+
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, []);
@@ -109,7 +105,6 @@ export default function Home() {
     if (!markdown) return;
     await navigator.clipboard.writeText(markdown);
     setToast("Markdown copied to clipboard");
-
     setTimeout(() => {
       setToast("");
     }, 2000);
@@ -139,6 +134,7 @@ export default function Home() {
       <Header
         markdown={markdown}
         currentFile={currentFile}
+        setCurrentFile={setCurrentFile}
         recentFiles={recentFiles}
         setRecentFiles={setRecentFiles}
         importMode={importMode}
@@ -147,13 +143,13 @@ export default function Home() {
         fileInputRef={fileInputRef}
       />
 
-      {/* ===== DESKTOP ===== */}
+      {/* DESKTOP */}
       <div className={styles.desktopContent}>
         <LeftPanel markdown={markdown} setMarkdown={setMarkdown} />
         <RightPanel markdown={markdown} />
       </div>
 
-      {/* ===== MOBILE ===== */}
+      {/* MOBILE */}
       <div className={styles.mobileContent}>
         <h1 className={styles.mobileTitle}>Markdown Presenter</h1>
         <p className={styles.mobileSubtitle}>
@@ -172,7 +168,7 @@ export default function Home() {
 
         <div className={styles.mobileActions}>
           <button
-            className={styles.secondaryButton}
+            className="fancyButton"
             onClick={copyMarkdown}
             disabled={!markdown.trim()}
           >
@@ -180,21 +176,21 @@ export default function Home() {
           </button>
 
           <button
-            className={styles.secondaryButton}
+            className="fancyButton"
             onClick={resetMarkdown}
             disabled={!markdown.trim()}
           >
             Reset
           </button>
-        </div>
 
-        <button
-          className={styles.mobileButton}
-          disabled={!markdown.trim()}
-          onClick={() => setShowMobileResult(true)}
-        >
-          Show Result
-        </button>
+          <button
+            className="fancyButton"
+            disabled={!markdown.trim()}
+            onClick={() => setShowMobileResult(true)}
+          >
+            Show Result
+          </button>
+        </div>
 
         {showMobileResult && (
           <div className={styles.mobilePreview}>
@@ -208,6 +204,7 @@ export default function Home() {
           Drop your <strong>.md</strong> file
         </div>
       )}
+
       {toast && <div className={styles.toast}>{toast}</div>}
     </div>
   );
