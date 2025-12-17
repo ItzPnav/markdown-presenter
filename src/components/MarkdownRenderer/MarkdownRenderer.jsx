@@ -10,12 +10,12 @@ export const MarkdownRenderer = ({ content }) => {
   let currentParagraph = [];
   let inCodeBlock = false;
   let codeBlockContent = [];
+
   let listItems = [];
   let inList = false;
 
   const isTableRow = (line) =>
     line.trim().startsWith("|") && line.trim().endsWith("|");
-
   const isTableDivider = (line) =>
     /^\|\s*-+/.test(line.trim()) && line.trim().endsWith("|");
 
@@ -23,102 +23,124 @@ export const MarkdownRenderer = ({ content }) => {
     if (!para.length) return null;
     const text = para.join(" ").trim();
     if (!text) return null;
-
     return (
-      <p key={elements.length} className={styles.paragraph}>
+      <p className={styles.paragraph}>
         {processInlineMarkdown(text)}
       </p>
     );
   };
 
   const processInlineMarkdown = (text) => {
-  const parts = [];
+    const parts = [];
 
-  const patterns = [
-    { regex: /\*\*(.*?)\*\*/g, type: "strong" },
-    { regex: /`(.*?)`/g, type: "code" },
-    { regex: /\[([^\]]+)\]\(([^)]+)\)/g, type: "link" },
-    { regex: /\*(.*?)\*/g, type: "em" },
-  ];
+    // Order matters: image first so it doesn't collide with other patterns
+    const patterns = [
+      {
+        // captures the src attribute
+        regex: /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g,
+        type: "image",
+      },
+      { regex: /\*\*(.*?)\*\*/g, type: "strong" },
+      { regex: /`(.*?)`/g, type: "code" },
+      { regex: /\[([^\]]+)\]\(([^)]+)\)/g, type: "link" },
+      { regex: /\*(.*?)\*/g, type: "em" },
+    ];
 
-  const matches = [];
+    const matches = [];
+    patterns.forEach(({ regex, type }) => {
+      let match;
+      regex.lastIndex = 0;
+      while ((match = regex.exec(text)) !== null) {
+        matches.push({
+          start: match.index,
+          end: match.index + match[0].length,
+          content: match[1],
+          href: match[2],
+          type,
+        });
+      }
+    });
 
-  // Collect all matches
-  patterns.forEach(({ regex, type }) => {
-    let match;
-    regex.lastIndex = 0;
-    while ((match = regex.exec(text)) !== null) {
-      matches.push({
-        start: match.index,
-        end: match.index + match[0].length,
-        content: match[1],
-        href: match[2],
-        type,
-      });
-    }
-  });
+    // Sort by appearance
+    matches.sort((a, b) => a.start - b.start);
 
-  // Sort by appearance
-  matches.sort((a, b) => a.start - b.start);
-
-  // Remove overlapping matches
-  const filtered = [];
-  for (const m of matches) {
-    const last = filtered[filtered.length - 1];
-    if (!last || m.start >= last.end) {
-      filtered.push(m);
-    }
-  }
-
-  let cursor = 0;
-
-  // Build output
-  filtered.forEach((m, i) => {
-    if (m.start > cursor) {
-      parts.push(text.slice(cursor, m.start));
+    // Remove overlapping matches
+    const filtered = [];
+    for (const m of matches) {
+      const last = filtered[filtered.length - 1];
+      if (!last || m.start >= last.end) {
+        filtered.push(m);
+      }
     }
 
-    switch (m.type) {
-      case "strong":
-        parts.push(<strong key={i}>{m.content}</strong>);
-        break;
-      case "em":
-        parts.push(<em key={i}>{m.content}</em>);
-        break;
-      case "code":
-        parts.push(
-          <code key={i} className={styles.inlineCode}>
-            {m.content}
-          </code>
-        );
-        break;
-      case "link":
-        parts.push(
-          <a
-            key={i}
-            href={m.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.link}
-          >
-            {m.content}
-          </a>
-        );
-        break;
-      default:
-        break;
+    let cursor = 0;
+
+    // Build output
+    filtered.forEach((m, i) => {
+      if (m.start > cursor) {
+        parts.push(text.slice(cursor, m.start));
+      }
+
+      switch (m.type) {
+        case "image": {
+          const src = m.content;
+          parts.push(
+            <img
+              key={`img-${i}-${src}`}
+              src={src}
+              alt=""
+              className={styles.inlineImage}
+            />
+          );
+          break;
+        }
+        case "strong":
+          parts.push(
+            <strong key={`strong-${i}`} className={styles.strong}>
+              {m.content}
+            </strong>
+          );
+          break;
+        case "code":
+          parts.push(
+            <code key={`code-${i}`} className={styles.inlineCode}>
+              {m.content}
+            </code>
+          );
+          break;
+        case "link":
+          parts.push(
+            <a
+              key={`link-${i}`}
+              href={m.href}
+              target="_blank"
+              rel="noreferrer"
+              className={styles.link}
+            >
+              {m.content}
+            </a>
+          );
+          break;
+        case "em":
+          parts.push(
+            <em key={`em-${i}`} className={styles.em}>
+              {m.content}
+            </em>
+          );
+          break;
+        default:
+          break;
+      }
+
+      cursor = m.end;
+    });
+
+    if (cursor < text.length) {
+      parts.push(text.slice(cursor));
     }
 
-    cursor = m.end;
-  });
-
-  if (cursor < text.length) {
-    parts.push(text.slice(cursor));
-  }
-
-  return parts;
-};
-
+    return parts;
+  };
 
   /* 🔥 IMPORTANT: classic for-loop */
   for (let index = 0; index < lines.length; index++) {
@@ -129,7 +151,7 @@ export const MarkdownRenderer = ({ content }) => {
     if (trimmed.startsWith("```")) {
       if (inCodeBlock) {
         elements.push(
-          <pre key={elements.length} className={styles.codeBlock}>
+          <pre key={`code-${index}`} className={styles.codeBlock}>
             <code>{codeBlockContent.join("\n")}</code>
           </pre>
         );
@@ -174,107 +196,130 @@ export const MarkdownRenderer = ({ content }) => {
         index++;
       }
 
-      index--; // step back one
+      // step back one so for-loop increment lands correctly
+      index--;
+
+      if (currentParagraph.length) {
+        elements.push(processParagraph(currentParagraph));
+        currentParagraph = [];
+      }
 
       elements.push(
-        <table key={elements.length} className={styles.table}>
+        <table key={`table-${index}`} className={styles.table}>
           <thead>
             <tr>
               {headers.map((h, i) => (
-                <th key={i}>{processInlineMarkdown(h)}</th>
+                <th key={`th-${i}`}>{processInlineMarkdown(h)}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, r) => (
-              <tr key={r}>
-                {row.map((cell, c) => (
-                  <td key={c}>{processInlineMarkdown(cell)}</td>
+            {rows.map((row, ri) => (
+              <tr key={`tr-${ri}`}>
+                {row.map((cell, ci) => (
+                  <td key={`td-${ri}-${ci}`}>
+                    {processInlineMarkdown(cell)}
+                  </td>
                 ))}
               </tr>
             ))}
           </tbody>
         </table>
       );
-
       continue;
     }
 
-    /* Headers */
-    if (trimmed.startsWith("#")) {
+    /* Headings */
+    if (/^#{1,6}\s+/.test(trimmed)) {
       if (currentParagraph.length) {
         elements.push(processParagraph(currentParagraph));
         currentParagraph = [];
       }
 
-      const level = trimmed.match(/^#+/)[0].length;
-      const text = trimmed.replace(/^#+\s*/, "");
-      const Tag = `h${Math.min(level, 6)}`;
+      const level = trimmed.match(/^#{1,6}/).length;
+      const text = trimmed.replace(/^#{1,6}\s+/, "");
+      const headingClass =
+        level === 1
+          ? styles.h1
+          : level === 2
+          ? styles.h2
+          : level === 3
+          ? styles.h3
+          : level === 4
+          ? styles.h4
+          : level === 5
+          ? styles.h5
+          : styles.h6;
 
       elements.push(
-        React.createElement(
-          Tag,
-          { key: elements.length, className: styles[`h${level}`] },
-          processInlineMarkdown(text)
-        )
+        <div key={`h-${index}`} className={headingClass}>
+          {processInlineMarkdown(text)}
+        </div>
       );
       continue;
     }
 
-    /* Divider */
-    if (trimmed === "---") {
+    /* Horizontal rule (section divider) */
+    if (/^(-{3,}|\*{3,})$/.test(trimmed)) {
       if (currentParagraph.length) {
         elements.push(processParagraph(currentParagraph));
         currentParagraph = [];
       }
-      elements.push(<hr key={elements.length} className={styles.hr} />);
+      elements.push(
+        <hr key={`hr-${index}`} className={styles.hr} />
+      );
       continue;
     }
 
     /* Lists */
-    if (/^[-*•]\s/.test(trimmed)) {
-      if (currentParagraph.length) {
-        elements.push(processParagraph(currentParagraph));
-        currentParagraph = [];
+    if (/^[-*+]\s+/.test(trimmed)) {
+      if (!inList) {
+        if (currentParagraph.length) {
+          elements.push(processParagraph(currentParagraph));
+          currentParagraph = [];
+        }
+        inList = true;
+        listItems = [];
       }
 
+      const itemText = trimmed.replace(/^[-*+]\s+/, "");
       listItems.push(
-        <li key={listItems.length} className={styles.listItem}>
-          {processInlineMarkdown(trimmed.replace(/^[-*•]\s/, ""))}
+        <li key={`li-${index}`} className={styles.listItem}>
+          {processInlineMarkdown(itemText)}
         </li>
       );
-      inList = true;
       continue;
+    } else if (inList) {
+      // list just ended
+      elements.push(
+        <ul key={`ul-${index}`} className={styles.list}>
+          {listItems}
+        </ul>
+      );
+      listItems = [];
+      inList = false;
     }
 
-    /* Empty line */
+    /* Blank line = paragraph break */
     if (!trimmed) {
       if (currentParagraph.length) {
         elements.push(processParagraph(currentParagraph));
         currentParagraph = [];
       }
-      if (inList) {
-        elements.push(
-          <ul key={elements.length} className={styles.list}>
-            {listItems}
-          </ul>
-        );
-        listItems = [];
-        inList = false;
-      }
       continue;
     }
 
-    currentParagraph.push(trimmed);
+    /* Default: accumulate paragraph text */
+    currentParagraph.push(line);
   }
 
+  // Flush remaining paragraph or list
   if (currentParagraph.length) {
     elements.push(processParagraph(currentParagraph));
   }
-
-  if (inList) {
+  if (inList && listItems.length) {
     elements.push(
-      <ul key={elements.length} className={styles.list}>
+      <ul key="ul-final" className={styles.list}>
         {listItems}
       </ul>
     );

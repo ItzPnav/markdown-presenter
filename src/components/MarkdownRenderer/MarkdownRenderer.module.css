@@ -79,8 +79,16 @@
 }
 
 /* =========================
-   INLINE CODE
+   INLINE TEXT STYLES
    ========================= */
+
+.strong {
+  font-weight: 700;
+}
+
+.em {
+  font-style: italic;
+}
 
 .inlineCode {
   background: #111;
@@ -88,6 +96,26 @@
   border-radius: 4px;
   font-family: monospace;
   font-size: 0.9em;
+}
+
+/* =========================
+   IMAGES
+   ========================= */
+
+.inlineImage {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 4px 0;
+}
+
+/* Optional: for future full-width/block images */
+.blockImage {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 12px auto;
 }
 
 /* =========================
@@ -154,15 +182,12 @@
 :global(.pdf-mode) {
   background: #ffffff !important;
   color: #000000 !important;
-
   font-size: 12px;
   line-height: 1.55;
-
   width: 100%;
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
-
   display: flex;
   justify-content: center;
 }
@@ -191,10 +216,18 @@
 }
 
 /* PDF heading sizes */
-:global(.pdf-mode h1) { font-size: 20px; }
-:global(.pdf-mode h2) { font-size: 18px; }
-:global(.pdf-mode h3) { font-size: 16px; }
-:global(.pdf-mode h4) { font-size: 14px; }
+:global(.pdf-mode h1) {
+  font-size: 20px;
+}
+:global(.pdf-mode h2) {
+  font-size: 18px;
+}
+:global(.pdf-mode h3) {
+  font-size: 16px;
+}
+:global(.pdf-mode h4) {
+  font-size: 14px;
+}
 
 /* =========================
    PAGE SAFETY (PDF)
