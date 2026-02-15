@@ -33,7 +33,9 @@ export const MarkdownRenderer = ({ content }) => {
 
   const processParagraph = (para) => {
     if (!para.length) return null;
-    const text = para.join(" ").trim();
+    // const text = para.join(" ").trim();
+    // new fix for single click of enter
+    const text = para.join("\n").trim();
     if (!text) return null;
     return (
       <p className={styles.paragraph}>
