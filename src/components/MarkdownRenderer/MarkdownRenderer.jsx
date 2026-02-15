@@ -15,6 +15,17 @@ export const MarkdownRenderer = ({ content }) => {
   let listItems = [];
   let inList = false;
 
+  /* blockquote */
+  let inBlockquote = false;
+  let blockquoteLines = [];
+  let blockquoteLevel = 1; // 🔽 ADDED
+
+  /* callout */
+  let inCallout = false;
+  let calloutType = "";
+  let calloutTitle = ""; // 🔽 ADDED
+  let calloutLines = [];
+
   const isTableRow = (line) =>
     line.trim().startsWith("|") && line.trim().endsWith("|");
   const isTableDivider = (line) =>
@@ -35,11 +46,8 @@ export const MarkdownRenderer = ({ content }) => {
     const parts = [];
 
     const patterns = [
-      // Block math $$...$$
       { regex: /\$\$(.*?)\$\$/g, type: "block-math" },
-      // Inline math $...$
       { regex: /\$(.*?)\$/g, type: "inline-math" },
-      // Images
       {
         regex: /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g,
         type: "image",
@@ -67,17 +75,9 @@ export const MarkdownRenderer = ({ content }) => {
 
     matches.sort((a, b) => a.start - b.start);
 
-    const filtered = [];
-    for (const m of matches) {
-      const last = filtered[filtered.length - 1];
-      if (!last || m.start >= last.end) {
-        filtered.push(m);
-      }
-    }
-
     let cursor = 0;
 
-    filtered.forEach((m, i) => {
+    matches.forEach((m, i) => {
       if (m.start > cursor) {
         parts.push(text.slice(cursor, m.start));
       }
@@ -109,18 +109,16 @@ export const MarkdownRenderer = ({ content }) => {
           );
           break;
         }
-        case "image": {
-          const src = m.content;
+        case "image":
           parts.push(
             <img
-              key={`img-${i}-${src}`}
-              src={src}
+              key={`img-${i}`}
+              src={m.content}
               alt=""
               className={styles.inlineImage}
             />
           );
           break;
-        }
         case "strong":
           parts.push(
             <strong key={`strong-${i}`} className={styles.strong}>
@@ -185,12 +183,11 @@ export const MarkdownRenderer = ({ content }) => {
     );
   };
 
-  /* 🔥 IMPORTANT: classic for-loop */
   for (let index = 0; index < lines.length; index++) {
     const line = lines[index];
     const trimmed = line.trim();
 
-    /* Code blocks */
+    /* CODE BLOCKS */
     if (trimmed.startsWith("```")) {
       if (inCodeBlock) {
         elements.push(
@@ -215,7 +212,84 @@ export const MarkdownRenderer = ({ content }) => {
       continue;
     }
 
-    /* Tables */
+    /* CALLOUT ::: */
+    if (trimmed.startsWith(":::")) {
+      if (inCallout) {
+        elements.push(
+          <div
+            key={`callout-${index}`}
+            className={`${styles.callout} ${styles[calloutType] || ""}`}
+          >
+            {calloutTitle && (
+              <div className={styles.calloutTitle}>
+                {processInlineMarkdown(calloutTitle)}
+              </div>
+            )}
+            {calloutLines.map((l, i) => (
+              <p key={i} className={styles.paragraph}>
+                {processInlineMarkdown(l)}
+              </p>
+            ))}
+          </div>
+        );
+        inCallout = false;
+        calloutLines = [];
+        calloutType = "";
+        calloutTitle = "";
+      } else {
+        if (currentParagraph.length) {
+          elements.push(processParagraph(currentParagraph));
+          currentParagraph = [];
+        }
+        const meta = trimmed.replace(":::", "").trim();
+        const [type, ...titleParts] = meta.split(" ");
+        calloutType = type;
+        calloutTitle = titleParts.join(" ");
+        inCallout = true;
+      }
+      continue;
+    }
+
+    if (inCallout) {
+      calloutLines.push(line);
+      continue;
+    }
+
+    /* BLOCKQUOTE GROUP (FIXED) */
+    if (/^>+/.test(trimmed)) {
+      if (currentParagraph.length) {
+        elements.push(processParagraph(currentParagraph));
+        currentParagraph = [];
+      }
+
+      const match = trimmed.match(/^(>+)\s?(.*)$/);
+      blockquoteLines.push({
+        level: match[1].length,
+        text: match[2],
+      });
+      inBlockquote = true;
+      continue;
+    } else if (inBlockquote) {
+      elements.push(
+        <blockquote key={`bq-${index}`} className={styles.blockquote}>
+          {blockquoteLines.map((line, i) => (
+            <div
+              key={i}
+              className={styles.blockquoteLine}
+              style={{ "--bq-level": line.level }}
+            >
+              {processInlineMarkdown(line.text)}
+            </div>
+          ))}
+        </blockquote>
+      );
+      blockquoteLines = [];
+      inBlockquote = false;
+    }
+
+
+
+    /* TABLES */
     if (
       isTableRow(trimmed) &&
       index + 1 < lines.length &&
@@ -271,7 +345,7 @@ export const MarkdownRenderer = ({ content }) => {
       continue;
     }
 
-    /* Centered div line */
+    /* CENTERED DIV */
     if (isCenteredDiv(line)) {
       if (currentParagraph.length) {
         elements.push(processParagraph(currentParagraph));
@@ -281,7 +355,7 @@ export const MarkdownRenderer = ({ content }) => {
       continue;
     }
 
-    /* Headings */
+    /* HEADINGS */
     if (/^#{1,6}\s+/.test(trimmed)) {
       if (currentParagraph.length) {
         elements.push(processParagraph(currentParagraph));
@@ -294,14 +368,14 @@ export const MarkdownRenderer = ({ content }) => {
         level === 1
           ? styles.h1
           : level === 2
-          ? styles.h2
-          : level === 3
-          ? styles.h3
-          : level === 4
-          ? styles.h4
-          : level === 5
-          ? styles.h5
-          : styles.h6;
+            ? styles.h2
+            : level === 3
+              ? styles.h3
+              : level === 4
+                ? styles.h4
+                : level === 5
+                  ? styles.h5
+                  : styles.h6;
 
       elements.push(
         <div key={`h-${index}`} className={headingClass}>
@@ -311,19 +385,17 @@ export const MarkdownRenderer = ({ content }) => {
       continue;
     }
 
-    /* Horizontal rule (section divider) */
+    /* HR */
     if (/^(-{3,}|\*{3,})$/.test(trimmed)) {
       if (currentParagraph.length) {
         elements.push(processParagraph(currentParagraph));
         currentParagraph = [];
       }
-      elements.push(
-        <hr key={`hr-${index}`} className={styles.hr} />
-      );
+      elements.push(<hr key={`hr-${index}`} className={styles.hr} />);
       continue;
     }
 
-    /* Lists */
+    /* LISTS */
     if (/^[-*+]\s+/.test(trimmed)) {
       if (!inList) {
         if (currentParagraph.length) {
@@ -334,10 +406,9 @@ export const MarkdownRenderer = ({ content }) => {
         listItems = [];
       }
 
-      const itemText = trimmed.replace(/^[-*+]\s+/, "");
       listItems.push(
         <li key={`li-${index}`} className={styles.listItem}>
-          {processInlineMarkdown(itemText)}
+          {processInlineMarkdown(trimmed.replace(/^[-*+]\s+/, ""))}
         </li>
       );
       continue;
@@ -351,7 +422,7 @@ export const MarkdownRenderer = ({ content }) => {
       inList = false;
     }
 
-    /* Blank line = paragraph break */
+    /* BLANK LINE */
     if (!trimmed) {
       if (currentParagraph.length) {
         elements.push(processParagraph(currentParagraph));
@@ -360,18 +431,26 @@ export const MarkdownRenderer = ({ content }) => {
       continue;
     }
 
-    /* Default: accumulate paragraph text */
     currentParagraph.push(line);
   }
 
   if (currentParagraph.length) {
     elements.push(processParagraph(currentParagraph));
   }
+
   if (inList && listItems.length) {
     elements.push(
       <ul key="ul-final" className={styles.list}>
         {listItems}
       </ul>
+    );
+  }
+
+  if (inBlockquote && blockquoteLines.length) {
+    elements.push(
+      <blockquote key="bq-final" className={styles.blockquote}>
+        {processInlineMarkdown(blockquoteLines.join(" "))}
+      </blockquote>
     );
   }
 

@@ -1,7 +1,8 @@
 .markdown {
   line-height: 1.7;
   color: inherit;
-  padding: 0 20px; /* consistent breathing room everywhere */
+  padding: 0 20px;
+  /* consistent breathing room everywhere */
 }
 
 /* =========================
@@ -219,12 +220,15 @@
 :global(.pdf-mode h1) {
   font-size: 20px;
 }
+
 :global(.pdf-mode h2) {
   font-size: 18px;
 }
+
 :global(.pdf-mode h3) {
   font-size: 16px;
 }
+
 :global(.pdf-mode h4) {
   font-size: 14px;
 }
@@ -266,4 +270,65 @@
 .mathBlock {
   margin: 16px 0;
   overflow-x: auto;
+}
+
+
+/* =========================
+   BLOCKQUOTE
+   ========================= */
+
+.blockquote {
+  background: #1f2933;
+  border-radius: 8px;
+  padding: 10px 0;
+  margin: 16px 0;
+}
+
+.blockquoteLine {
+  position: relative;
+  padding: 8px 16px 8px calc(16px + var(--bq-level) * 14px);
+  color: #e5e7eb;
+}
+
+/* stacked bars */
+.blockquoteLine::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(var(--bq-level) * 6px);
+  background: linear-gradient(to right,
+      #2563eb,
+      rgba(37, 99, 235, 0.7),
+      rgba(37, 99, 235, 0.4));
+}
+
+
+
+/* =========================
+   CALLOUTS
+   ========================= */
+
+.callout {
+  border: 1px solid #333;
+  border-left-width: 5px;
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin: 16px 0;
+}
+
+.note {
+  border-left-color: #2563eb;
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.warning {
+  border-left-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.info {
+  border-left-color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
 }
