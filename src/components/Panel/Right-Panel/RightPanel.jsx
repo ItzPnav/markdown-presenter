@@ -1,7 +1,7 @@
 import { MarkdownRenderer } from "../../MarkdownRenderer/MarkdownRenderer";
 import styles from "./RightPanel.module.css";
 
-export default function RightPanel({ markdown }) {
+export default function RightPanel({ markdown, images }) {
   const isEmpty = !markdown || markdown.trim().length === 0;
 
   return (
@@ -18,7 +18,7 @@ export default function RightPanel({ markdown }) {
             </p>
           </div>
         ) : (
-          <MarkdownRenderer content={markdown} />
+          <MarkdownRenderer content={markdown} images={images} />
         )}
       </div>
     </div>

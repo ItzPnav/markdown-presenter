@@ -2,7 +2,7 @@ import React from "react";
 import katex from "katex";
 import styles from "./MarkdownRenderer.module.css";
 
-export const MarkdownRenderer = ({ content }) => {
+export const MarkdownRenderer = ({ content, images }) => {
   if (!content) return null;
 
   const lines = content.split("\n");
@@ -35,11 +35,18 @@ export const MarkdownRenderer = ({ content }) => {
     if (!para.length) return null;
     // const text = para.join(" ").trim();
     // new fix for single click of enter
-    const text = para.join("\n").trim();
-    if (!text) return null;
+    // const text = para.join("\n").trim();
+    // better single click enter
+    // const text = para.join("<br />").trim();
+    // if (!text) return null;
     return (
       <p className={styles.paragraph}>
-        {processInlineMarkdown(text)}
+        {para.map((line, i) => (
+          <React.Fragment key={i}>
+            {processInlineMarkdown(line)}
+            {i !== para.length - 1 && <br />}
+          </React.Fragment>
+        ))}
       </p>
     );
   };
@@ -48,17 +55,26 @@ export const MarkdownRenderer = ({ content }) => {
     const parts = [];
 
     const patterns = [
+      {
+        regex: /!\[Image (\d+)\]/g,
+        type: "stored-image",
+      },
       { regex: /\$\$(.*?)\$\$/g, type: "block-math" },
       { regex: /\$(.*?)\$/g, type: "inline-math" },
       {
         regex: /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g,
         type: "image",
       },
+      {
+        regex: /!\[([^\]]*)\]\(([^)]+)\)/g,
+        type: "markdown-image",
+      },
       { regex: /\*\*(.*?)\*\*/g, type: "strong" },
       { regex: /`(.*?)`/g, type: "code" },
-      { regex: /\[([^\]]+)\]\(([^)]+)\)/g, type: "link" },
+      { regex: /(?<!\!)\[([^\]]+)\]\(([^)]+)\)/g, type: "link" },
       { regex: /\*(.*?)\*/g, type: "em" },
     ];
+
 
     const matches = [];
     patterns.forEach(({ regex, type }) => {
@@ -85,6 +101,33 @@ export const MarkdownRenderer = ({ content }) => {
       }
 
       switch (m.type) {
+        case "stored-image": {
+          const token = `![Image ${m.content}]`;
+          const src = images?.[token];
+
+          if (src) {
+            parts.push(
+              <img
+                key={`stored-${i}`}
+                src={src}
+                alt=""
+                className={styles.inlineImage}
+              />
+            );
+          }
+          break;
+        }
+        case "markdown-image":
+          parts.push(
+            <img
+              key={`md-img-${i}`}
+              src={m.href}
+              alt={m.content}
+              className={styles.inlineImage}
+            />
+          );
+          break;
+
         case "block-math": {
           const html = katex.renderToString(m.content, {
             displayMode: true,

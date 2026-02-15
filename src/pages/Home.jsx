@@ -6,8 +6,13 @@ import styles from "./Home.module.css";
 
 const RECENT_KEY = "md-presenter-recent-files";
 const DRAFT_KEY = "md-presenter-draft";
+const IMAGES_KEY = "md-presenter-images";
+const IMAGE_EXPIRY_MS = 2 * 60 * 60 * 1000; // 2 hours
+
+
 
 export default function Home() {
+  const [images, setImages] = useState({});
   const [toast, setToast] = useState("");
   const [markdown, setMarkdown] = useState("");
   const [currentFile, setCurrentFile] = useState(null);
@@ -21,6 +26,26 @@ export default function Home() {
 
   /* ===== LOAD localStorage ===== */
   useEffect(() => {
+    const savedImages = localStorage.getItem(IMAGES_KEY);
+    if (savedImages) {
+      try {
+        const parsed = JSON.parse(savedImages);
+        const now = Date.now();
+
+        const cleaned = {};
+
+        Object.entries(parsed).forEach(([key, value]) => {
+          if (value.expiresAt && value.expiresAt > now) {
+            cleaned[key] = value;
+          }
+        });
+
+        setImages(cleaned);
+      } catch {
+        setImages({});
+      }
+    }
+
     const savedRecent = localStorage.getItem(RECENT_KEY);
     if (savedRecent) {
       try {
@@ -49,6 +74,32 @@ export default function Home() {
     if (!hydrated) return;
     localStorage.setItem(DRAFT_KEY, markdown);
   }, [markdown, hydrated]);
+
+  /* ===== SAVE images ===== */
+  useEffect(() => {
+    if (!hydrated) return;
+    localStorage.setItem(IMAGES_KEY, JSON.stringify(images));
+  }, [images, hydrated]);
+
+  /* ===== AUTO CLEAN EXPIRED IMAGES ===== */
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setImages(prev => {
+        const now = Date.now();
+        const cleaned = {};
+
+        Object.entries(prev).forEach(([key, value]) => {
+          if (value.expiresAt > now) {
+            cleaned[key] = value;
+          }
+        });
+
+        return cleaned;
+      });
+    }, 5 * 60 * 1000); // every 5 mins
+
+    return () => clearInterval(interval);
+  }, []);
 
   /* ===== FILE LOADER ===== */
   const loadFile = (fileObj) => {
@@ -145,8 +196,16 @@ export default function Home() {
 
       {/* DESKTOP */}
       <div className={styles.desktopContent}>
-        <LeftPanel markdown={markdown} setMarkdown={setMarkdown} />
-        <RightPanel markdown={markdown} />
+        <LeftPanel
+          markdown={markdown}
+          setMarkdown={setMarkdown}
+          images={images}
+          setImages={setImages}
+        />
+        <RightPanel
+          markdown={markdown}
+          images={images}
+        />
       </div>
 
       {/* MOBILE */}
@@ -194,7 +253,7 @@ export default function Home() {
 
         {showMobileResult && (
           <div className={styles.mobilePreview}>
-            <RightPanel markdown={markdown} />
+            <RightPanel markdown={markdown} images={images} />
           </div>
         )}
       </div>
