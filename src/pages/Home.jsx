@@ -89,17 +89,23 @@ export default function Home() {
         const cleaned = {};
 
         Object.entries(prev).forEach(([key, value]) => {
-          if (value.expiresAt > now) {
+          // If old format (string), keep it
+          if (typeof value === "string") {
+            cleaned[key] = value;
+          }
+          // If new format, check expiry
+          else if (value.expiresAt > now) {
             cleaned[key] = value;
           }
         });
 
         return cleaned;
       });
-    }, 5 * 60 * 1000); // every 5 mins
+    }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, []);
+
 
   /* ===== FILE LOADER ===== */
   const loadFile = (fileObj) => {

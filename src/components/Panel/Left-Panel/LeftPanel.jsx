@@ -24,9 +24,12 @@ export default function LeftPanel({ markdown, setMarkdown, images, setImages }) 
           const token = `![Image ${id}]`;
 
           // Store base64 separately
-          setImages((prev) => ({
+          setImages(prev => ({
             ...prev,
-            [token]: base64
+            [token]: {
+              data: base64,
+              expiresAt: Date.now() + IMAGE_EXPIRY_MS
+            }
           }));
 
           // Insert clean token only
