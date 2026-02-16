@@ -13,7 +13,8 @@
 .desktopContent {
   flex: 1;
   display: flex;
-  min-height: 0; /* 🔥 critical */
+  min-height: 0;
+  /* 🔥 critical */
 }
 
 /* Hide desktop on mobile */
@@ -155,6 +156,7 @@
     opacity: 0;
     transform: translateX(-50%) translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0);

@@ -72,7 +72,7 @@ export const MarkdownRenderer = ({ content, images }) => {
       { regex: /\*\*(.*?)\*\*/g, type: "strong" },
       { regex: /`(.*?)`/g, type: "code" },
       { regex: /(?<!\!)\[([^\]]+)\]\(([^)]+)\)/g, type: "link" },
-      { regex: /\*(.*?)\*/g, type: "em" },
+      { regex: /(?<!\*)\*(?!\*)(.*?)\*(?<!\*)/g, type: "em" },
     ];
 
 
