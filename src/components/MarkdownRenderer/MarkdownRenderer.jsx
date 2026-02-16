@@ -407,8 +407,12 @@ export const MarkdownRenderer = ({ content, images }) => {
         currentParagraph = [];
       }
 
-      const level = trimmed.match(/^#{1,6}/).length;
+      const match = trimmed.match(/^#{1,6}/);
+      const level = match[0].length;
       const text = trimmed.replace(/^#{1,6}\s+/, "");
+
+      const HeadingTag = `h${level}`;
+
       const headingClass =
         level === 1
           ? styles.h1
@@ -423,12 +427,19 @@ export const MarkdownRenderer = ({ content, images }) => {
                   : styles.h6;
 
       elements.push(
-        <div key={`h-${index}`} className={headingClass}>
-          {processInlineMarkdown(text)}
-        </div>
+        React.createElement(
+          HeadingTag,
+          {
+            key: `h-${index}`,
+            className: headingClass,
+          },
+          processInlineMarkdown(text)
+        )
       );
+
       continue;
     }
+
 
     /* HR */
     if (/^(-{3,}|\*{3,})$/.test(trimmed)) {
